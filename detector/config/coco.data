@@ -1,0 +1,4 @@
+classes= 80
+names = detector/config/coco.names
+eval=coco
+
