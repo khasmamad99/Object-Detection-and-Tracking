@@ -57,6 +57,7 @@ class METADATA(Structure):
                 ("names", POINTER(c_char_p))]
                 
 
+
 class Detector:
     def __init__(self, cfg="detector/config/yolov3-tiny.cfg",
                        weights="detector/config/yolov3-tiny.weights", 
@@ -71,7 +72,7 @@ class Detector:
     
     def detect(self, img, once=True, thresh=0.5, hier_thresh=.5, nms=.45):
         if type(img) is str:
-            img = self.load_image(img, 0, 0)
+            img = self.load_image(img.encode("ascii"), 0, 0)
         else:
             img, _ = array_to_image(img)
 
@@ -79,7 +80,7 @@ class Detector:
         pnum = pointer(num)
         self.predict_image(self.net, img)
         letter_box = 0
-        dets = self.get_network_boxes(net, img.w, img.h, thresh, hier_thresh, None, 0, pnum, letter_box)
+        dets = self.get_network_boxes(self.net, img.w, img.h, thresh, hier_thresh, None, 0, pnum, letter_box)
         num = pnum[0]
         self.do_nms_sort(dets, num, self.meta.classes, nms)
         res = []
@@ -87,8 +88,10 @@ class Detector:
             for i in range(self.meta.classes):
                 if dets[j].prob[i] > 0:
                     b = dets[j].bbox
-                    label = meta.names[i].decode("ascii")
-                    res.append({"label":label, "bbox":[b.x, b.y, b.w, b.h], "perc":dets[j].prob[i]})
+                    x = b.x - b.w / 2
+                    y = b.y - b.h / 2
+                    label = self.meta.names[i].decode("ascii")
+                    res.append({"label":label, "bbox":[x, y, b.w, b.h], "perc":dets[j].prob[i]})
 
         self.free_detections(dets, num)
         if once:
@@ -99,13 +102,36 @@ class Detector:
     
     def visualize(self, img, dets=None, once=True, thresh=0.5, show=False):
         if dets == None:
-            dets = self.detect(img, once,)
+            dets = self.detect(img, once=once, thresh=thresh)
 
         if type(img) is str:
-            img = self.load_image(img, 0, 0)
-        else:
-            img, _ = array_to_image(img)
+            img = cv.imread(img)
+            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
+        font = cv.FONT_HERSHEY_DUPLEX
+        font_scale = 0.7
+        thickness = 0.8
+        line = cv.LINE_AA
+        margin = 10
+        print(self.colors)
+
+        for det in dets:
+            color = self.colors[det["label"]]
+            print(type(color[0]))
+            x, y, w, h = [int(a) for a in det["bbox"]]
+            print(x, y, w, h)
+            img = cv.rectangle(img, (int(x), int(y)), (int(x+w), int(y+h)), color, thickness, line)
+            text = det["label"] + " " + str(det["perc"])[:4]
+            text_width, text_height = cv.getTextSize(text, font, font_scale, thickness)[0]
+            img = cv.rectangle(img, (x, y+text_height+margin), (x+text_width+margin, y), color, thickness, cv.FILLED)
+            img = cv.putText(img, text, (x+margin/2, y-margin/2), font, font_scale, (0,0,0), thickness, line)
+
+        if show:
+            cv.imshow("", img)
+            cv.waitKey(0)
+        
+        return img
+            
         
 
     def init_colors(self, names):
@@ -184,3 +210,7 @@ class Detector:
         self.predict_image = lib.network_predict_image
         self.predict_image.argtypes = [c_void_p, IMAGE]
         self.predict_image.restype = POINTER(c_float)
+
+
+det = Detector()
+det.visualize("/home/khasmamad/Desktop/darknet/data/dog.jpg", show=True)
