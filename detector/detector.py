@@ -106,11 +106,13 @@ class Detector:
 
         if type(img) is str:
             img = cv.imread(img)
-            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+            # img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+
+        print(type(img))
 
         font = cv.FONT_HERSHEY_DUPLEX
-        font_scale = 0.7
-        thickness = 0.8
+        font_scale = 0.6
+        thickness = 2
         line = cv.LINE_AA
         margin = 10
         print(self.colors)
@@ -120,11 +122,11 @@ class Detector:
             print(type(color[0]))
             x, y, w, h = [int(a) for a in det["bbox"]]
             print(x, y, w, h)
-            img = cv.rectangle(img, (int(x), int(y)), (int(x+w), int(y+h)), color, thickness, line)
+            img = cv.rectangle(img, (x, y), (x+w, y+h), color, thickness, line)
             text = det["label"] + " " + str(det["perc"])[:4]
             text_width, text_height = cv.getTextSize(text, font, font_scale, thickness)[0]
-            img = cv.rectangle(img, (x, y+text_height+margin), (x+text_width+margin, y), color, thickness, cv.FILLED)
-            img = cv.putText(img, text, (x+margin/2, y-margin/2), font, font_scale, (0,0,0), thickness, line)
+            img = cv.rectangle(img, (x, y-(text_height+margin)), (x+text_width+margin, y), color, -1)
+            img = cv.putText(img, text, (int(x+margin/2), int(y-margin/2)), font, font_scale, (0,0,0), thickness-1, line)
 
         if show:
             cv.imshow("", img)
@@ -152,7 +154,7 @@ class Detector:
             r = int(r) % 256
             g = int(g) % 256
             b = int(b) % 256
-            colors[classes[i]] = (r,g,b)
+            colors[classes[i]] = (b, g, r)
         
         return colors
     
