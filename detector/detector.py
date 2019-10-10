@@ -146,7 +146,7 @@ class Detector:
         r = int(random.random() * 256)
         g = int(random.random() * 256)
         b = int(random.random() * 256)
-        step = 256 / no_of_classes
+        step = 256 / 20     # Might need to change
         for i in range(no_of_classes):
             r += step
             g += step
