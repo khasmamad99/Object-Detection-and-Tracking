@@ -112,13 +112,10 @@ class Detector:
         thickness = 2
         line = cv.LINE_AA
         margin = 10
-        print(self.colors)
 
         for det in dets:
             color = self.colors[det["label"]]
-            print(type(color[0]))
             x, y, w, h = [int(a) for a in det["bbox"]]
-            print(x, y, w, h)
             img = cv.rectangle(img, (x, y), (x+w, y+h), color, thickness, line)
             text = det["label"] + " " + str(det["perc"])[:4]
             text_width, text_height = cv.getTextSize(text, font, font_scale, thickness)[0]

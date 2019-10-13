@@ -9,8 +9,8 @@ from detector.detector import Detector
 
 # Global variables
 clicked = False
-X, Y = None
-
+X = None
+Y = None
 
 def on_mouse(event, x, y, flags, params):
     global clicked, X, Y
@@ -50,6 +50,7 @@ def main():
 
         if not tracking:
             dets = detector.detect(frame, once=False)
+            frame = detector.visualize(frame, dets=dets, once=False)
 
         elif not tracking and clicked:
             target_bbox = []
@@ -81,7 +82,7 @@ def main():
             x = cx - w/2
             y = cy - h/2
             if state['score'] > 0.8:
-                frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0,0,255), 2, cv.LINE_AA)
+                frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0,0,255), 2, cv2.LINE_AA)
 
         cv2.imshow("window", frame)
         key = cv2.waitKey(1)
@@ -90,3 +91,5 @@ def main():
             clicked = False
         elif key == 'q':
             break  
+
+main()

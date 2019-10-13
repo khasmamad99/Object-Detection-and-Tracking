@@ -3,3 +3,9 @@
 
 # Darknet weights
 *.weights
+
+# pycache
+__pycache__
+
+# model
+*.pth
