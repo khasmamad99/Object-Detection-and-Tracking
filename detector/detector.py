@@ -70,7 +70,7 @@ class Detector:
         self.colors = self.init_colors(names)
 
     
-    def detect(self, img, once=True, thresh=0.5, hier_thresh=.5, nms=.45):
+    def detect(self, img, once=True, thresh=0.25, hier_thresh=.5, nms=.45):
         if type(img) is str:
             img = self.load_image(img.encode("ascii"), 0, 0)
         else:
@@ -100,7 +100,7 @@ class Detector:
         return res
 
     
-    def visualize(self, img, dets=None, once=True, thresh=0.5, show=False):
+    def visualize(self, img, dets=None, once=True, thresh=0.25, show=False):
         if dets == None:
             dets = self.detect(img, once=once, thresh=thresh)
 
