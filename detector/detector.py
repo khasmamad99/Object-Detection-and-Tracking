@@ -106,9 +106,6 @@ class Detector:
 
         if type(img) is str:
             img = cv.imread(img)
-            # img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-
-        print(type(img))
 
         font = cv.FONT_HERSHEY_DUPLEX
         font_scale = 0.6
@@ -173,9 +170,6 @@ class Detector:
 
         self.copy_image_from_bytes = lib.copy_image_from_bytes
         self.copy_image_from_bytes.argtypes = [IMAGE,c_char_p]
-        
-        # self.network_width = lib.network_width(self.net)
-        # self.network_height = lib.network_height(self.net)
 
         self.get_network_boxes = lib.get_network_boxes
         self.get_network_boxes.argtypes = [c_void_p, c_int, c_int, c_float, c_float, POINTER(c_int), c_int, POINTER(c_int), c_int]
@@ -214,5 +208,5 @@ class Detector:
         self.predict_image.restype = POINTER(c_float)
 
 
-det = Detector()
-det.visualize("/home/khasmamad/Desktop/darknet/data/dog.jpg", show=True)
+# det = Detector()
+# det.visualize("/home/khasmamad/Desktop/darknet/data/dog.jpg", show=True)
