@@ -47,12 +47,14 @@ def main():
         ret, frame = cap.read()
         if not ret:
             break
+        frame = cv2.flip(frame, 1)
 
         if not tracking:
             dets = detector.detect(frame, once=False)
             frame = detector.visualize(frame, dets=dets, once=False)
 
         elif not tracking and clicked:
+            print(clicked)
             target_bbox = []
             for det in dets:
                 bbox = det['bbox']
@@ -86,10 +88,10 @@ def main():
 
         cv2.imshow("window", frame)
         key = cv2.waitKey(1)
-        if key == 'c':
+        if key == ord('c'):
             tracking = False
             clicked = False
-        elif key == 'q':
+        elif key == ord('q'):
             break  
 
 main()
