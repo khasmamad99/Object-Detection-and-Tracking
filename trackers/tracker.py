@@ -7,20 +7,12 @@
 from os.path import dirname, abspath
 from ipdb import set_trace
 import torch
-from trackers.THOR_modules.wrapper import THOR_SiamFC, THOR_SiamRPN, THOR_SiamMask
-
-# SiamFC import
-from trackers.SiamFC.net import SiamFC
-from trackers.SiamFC.siamfc import SiamFC_init, SiamFC_track
+from trackers.THOR_modules.wrapper import THOR_SiamRPN
 
 # SiamRPN Imports
 from trackers.SiamRPN.net import SiamRPN
 from trackers.SiamRPN.siamrpn import SiamRPN_init, SiamRPN_track
 
-# SiamMask Imports
-from trackers.SiamMask.net import SiamMaskCustom
-from trackers.SiamMask.siammask import SiamMask_init, SiamMask_track
-from trackers.SiamMask.utils.load_helper import load_pretrain
 
 class Tracker():
     def __init__(self):
@@ -45,25 +37,25 @@ class Tracker():
         self.temp_mem.update(im, state['crop'], state['target_pos'], state['target_sz'])
         return state
 
-class SiamFC_Tracker(Tracker):
-    def __init__(self, cfg):
-        super(SiamFC_Tracker, self).__init__()
-        self.cfg = cfg
+# class SiamFC_Tracker(Tracker):
+#     def __init__(self, cfg):
+#         super(SiamFC_Tracker, self).__init__()
+#         self.cfg = cfg
 
-        # setting up the tracker
-        model_path = dirname(abspath(__file__)) + '/SiamFC/model.pth'
-        model = SiamFC()
-        model.load_state_dict(torch.load(model_path))
-        self.model = model.eval().to(self.device)
+#         # setting up the tracker
+#         model_path = dirname(abspath(__file__)) + '/SiamFC/model.pth'
+#         model = SiamFC()
+#         model.load_state_dict(torch.load(model_path))
+#         self.model = model.eval().to(self.device)
 
-        # set up template memory
-        self.temp_mem = THOR_SiamFC(cfg=cfg['THOR'], net=self.model)
+#         # set up template memory
+#         self.temp_mem = THOR_SiamFC(cfg=cfg['THOR'], net=self.model)
 
-    def init_func(self, im, pos, sz):
-        return SiamFC_init(im, pos, sz, self.cfg['tracker'])
+#     def init_func(self, im, pos, sz):
+#         return SiamFC_init(im, pos, sz, self.cfg['tracker'])
 
-    def track_func(self, state, im):
-        return SiamFC_track(state, im, self.temp_mem)
+#     def track_func(self, state, im):
+#         return SiamFC_track(state, im, self.temp_mem)
 
 class SiamRPN_Tracker(Tracker):
     def __init__(self, cfg):
@@ -86,23 +78,23 @@ class SiamRPN_Tracker(Tracker):
     def track_func(self, state, im):
         return SiamRPN_track(state, im, self.temp_mem)
 
-class SiamMask_Tracker(Tracker):
-    def __init__(self, cfg):
-        super(SiamMask_Tracker, self).__init__()
-        self.cfg = cfg
-        self.mask = True
+# class SiamMask_Tracker(Tracker):
+#     def __init__(self, cfg):
+#         super(SiamMask_Tracker, self).__init__()
+#         self.cfg = cfg
+#         self.mask = True
 
-        # setting up the model
-        model_path = dirname(abspath(__file__)) + '/SiamMask/model.pth'
-        model = SiamMaskCustom(anchors=cfg['anchors'])
-        model = load_pretrain(model, model_path)
-        self.model = model.eval().to(self.device)
+#         # setting up the model
+#         model_path = dirname(abspath(__file__)) + '/SiamMask/model.pth'
+#         model = SiamMaskCustom(anchors=cfg['anchors'])
+#         model = load_pretrain(model, model_path)
+#         self.model = model.eval().to(self.device)
 
-        # set up template memory
-        self.temp_mem = THOR_SiamMask(cfg=cfg['THOR'], net=self.model)
+#         # set up template memory
+#         self.temp_mem = THOR_SiamMask(cfg=cfg['THOR'], net=self.model)
 
-    def init_func(self, im, pos, sz):
-        return SiamMask_init(im, pos, sz, self.model, self.cfg['tracker'])
+#     def init_func(self, im, pos, sz):
+#         return SiamMask_init(im, pos, sz, self.model, self.cfg['tracker'])
 
-    def track_func(self, state, im):
-        return SiamMask_track(state, im, self.temp_mem)
+#     def track_func(self, state, im):
+#         return SiamMask_track(state, im, self.temp_mem)
